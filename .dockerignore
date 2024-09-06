@@ -1,0 +1,5 @@
+snapshot
+.gitignore
+Makefile
+node_modules
+.devcontainer
