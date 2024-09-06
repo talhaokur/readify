@@ -1,0 +1,19 @@
+{
+    "name": "readify-app",
+    "version": "1.0.0",
+    "description": "Basic Node.js API for /readify with Mozilla Readability",
+    "main": "app.js",
+    "scripts": {
+        "start": "node app.js"
+    },
+    "dependencies": {
+        "@mozilla/readability": "^0.5.0",
+        "axios": "^1.3.5",
+        "cheerio": "^1.0.0-rc.12",
+        "epub-gen": "^0.1.0",
+        "express": "^4.19.2",
+        "image-downloader": "^4.3.0",
+        "jsdom": "^25.0.0",
+        "uuid": "^10.0.0"
+    }
+}
