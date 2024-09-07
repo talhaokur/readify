@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import articleRoute from './article.route.js';
+import generateRoute from './generate.route.js';
 
 const router = Router();
 
@@ -16,5 +17,6 @@ router.get('/ping', (req, res, next) => {
 });
 
 router.use('/api/articles', articleRoute);
+router.use('/api/generate', generateRoute);
 
 export default router;
