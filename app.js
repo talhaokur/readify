@@ -4,6 +4,8 @@ import { dirname } from 'path';
 import cors from 'cors';
 import bodyParser from "body-parser";
 import routes from './routes/index.js';
+import { GLOBALS } from './configs.js';
+import path from 'path';
 
 const app = express();
 app.use(bodyParser.json());
@@ -15,7 +17,8 @@ app.use(cors());
 // Artifact repository
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-app.locals.workingdir = __dirname;
+GLOBALS.workingDir = __dirname;
+GLOBALS.outputDir = path.join(__dirname, 'output');
 
 app.use(
     (err, req, res, next) => {

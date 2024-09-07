@@ -1,13 +1,12 @@
-import express from 'express';
 import fs from 'node:fs';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
-
-const app = express();
+import { GLOBALS } from '../configs.js';
 
 class JobContainerService {
     constructor() {
-        this.mainRepository = (app.locals.workingdir, 'output');
+        this.mainRepository = path.join(GLOBALS.workingDir, 'output');
+        console.log(`main repo is ${this.mainRepository}`);
     }
 
     async initializeJob() {
