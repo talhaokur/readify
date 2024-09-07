@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import cors from 'cors';
 import bodyParser from "body-parser";
+import routes from './routes/index.js';
 
 const app = express();
 app.use(bodyParser.json());
@@ -16,11 +17,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 app.use(express.static(__dirname + '/output'));
 
-app.get('/', (req, res) => {
-    res.json({status: "OK"});
-});
-
-
 app.use(
     (err, req, res, next) => {
         if (err && err.errorCode) {
@@ -31,6 +27,8 @@ app.use(
         console.error(`${err}, ${err.message}`)
     });
 
+// Mount the routes
+app.use(routes);
 
 const PORT = process.env.PORT || 3000;
 
