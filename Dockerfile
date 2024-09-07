@@ -1,4 +1,4 @@
-# Use the official Node.js 18 image as a base
+# Use the official Node.js 22 image as a base
 FROM node:22-alpine
 
 # Set the working directory inside the container
@@ -10,6 +10,9 @@ RUN npm install
 
 # Copy the rest of the application code
 COPY . .
+
+# Create artifact repository
+RUN mkdir -p output
 
 # Expose the port the app will run on
 EXPOSE 3000
