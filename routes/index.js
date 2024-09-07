@@ -1,6 +1,5 @@
 import { Router } from 'express';
-import epubRoute from './epub.route.js';
-import generateRoute from './generate.route.js';
+import jobsRoute from './jobs.route.js';
 
 const router = Router();
 
@@ -16,7 +15,6 @@ router.get('/ping', (req, res, next) => {
     });
 });
 
-router.use('/api/epubs', epubRoute);
-router.use('/api/generate', generateRoute);
+router.use('/api/jobs', jobsRoute);
 
 export default router;
