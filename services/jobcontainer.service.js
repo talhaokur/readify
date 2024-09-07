@@ -38,6 +38,16 @@ class JobContainerService {
         console.info(`Image repository is created for jobId:${jobId}`);
         return imageRepoPath;
     }
+
+    deleteRepository(jobId) {
+        if (!jobId)
+            throw new Error('jobId cannot be null or empty!'); // TODO change this to a proper one
+
+        const jobRepoPath = path.join(this.mainRepository, jobId);
+
+        fs.rmSync(jobRepoPath, { recursive: true, force: true });
+        console.info(`Job repository deleted successfuly with id: ${jobId}`);
+    }
 }
 
 export const jobContainerService = new JobContainerService();

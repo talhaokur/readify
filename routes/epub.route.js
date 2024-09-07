@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'path';
 import { GLOBALS } from '../configs.js';
 import { epubService } from '../services/epub.service.js';
+import { jobContainerService } from '../services/jobcontainer.service.js';
 
 const router = Router();
 
@@ -26,19 +27,34 @@ router.get("/:uuid", async (req, res, next) => {
     if (!fs.existsSync(jobRepository))
         return res.status(HttpStatusCode.NotFound).json();
 
-    const epubPath = epubService.getEpubFilePath(jobRepository, (p) => { return p; });
+    try {
+        const epubPath = epubService.getEpubFilePath(jobRepository, (p) => { return p; });
+        if (!epubPath)
+            return res.status(HttpStatusCode.NotFound).json({ message: "No ePub found!" });
 
-    if (!epubPath)
-        return res.status(HttpStatusCode.NotFound).json({ message: "No ePub found!" });
-    
-    return res.download(epubPath);
+        return res.download(epubPath);
+    } catch (error) {
+        console.error('error during getting epub file for', uuid, error);
+    }
 });
 
-router.delete("/:uuid", (req, res) => {
+router.delete("/:uuid", (req, res, next) => {
     const { uuid } = req.params;
     if (!isValidUUID(uuid))
         return res.status(HttpStatusCode.BadRequest).json({ message: `Given id is not valid` });
-    return res.status(HttpStatusCode.NotImplemented).json();
+
+    const jobRepository = path.join(GLOBALS.outputDir, uuid);
+
+    if (!fs.existsSync(jobRepository))
+        return res.status(HttpStatusCode.NotFound).json({ message: `No job found with id:${uuid}` });
+
+    try {
+        jobContainerService.deleteRepository(uuid);
+        return res.status(HttpStatusCode.Ok).json({ message: `Job ${uuid} deleted successfully` });
+    } catch (error) {
+        console.error("Error during deletion of the job repository for ", uuid, error);
+        next(error);
+    }
 });
 
 export default router;
