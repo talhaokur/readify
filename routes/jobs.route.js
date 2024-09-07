@@ -14,13 +14,18 @@ function isValidUUID(uuid) {
     return regex.test(uuid);
 }
 
+function getEntityURL(req, id) {
+    const domain = req.protocol + '://' + req.get('host');
+    return new URL(`/api/jobs/${id}`, domain); // TODO find a solution for hard-coded /api/jobs
+}
+
 router.post('/', async (req, res, next) => {
     const { url } = req.body;
 
     if (!url) {
         return res.status(HttpStatusCode.BadRequest).json({ error: 'URL is required' });
     }
-
+    console.log("new request for: ", );
     try {
         const [jobId, repo] = await jobContainerService.initializeJob();
         const pgs = new PageService(url, repo);
@@ -46,7 +51,8 @@ router.post('/', async (req, res, next) => {
         const epubFilePath = path.join(repo, `${pageTitle}.epub`);
         await epubService.generateEpub(options, epubFilePath);
         jobContainerService.deleteImageRepositoryForJob(jobId);
-        return res.status(HttpStatusCode.Created).json({ jobId: jobId });
+        const entityUrl = getEntityURL(req, jobId);
+        return res.status(HttpStatusCode.Created).json({ jobId: jobId, entity: entityUrl});
     } catch (error) {
         next(error);
     }
