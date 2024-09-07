@@ -44,7 +44,8 @@ router.post('/', async (req, res, next) => {
         };
 
         const epubFilePath = path.join(repo, `${pageTitle}.epub`);
-        epubService.generateEpub(options, epubFilePath);
+        await epubService.generateEpub(options, epubFilePath);
+        jobContainerService.deleteImageRepositoryForJob(jobId);
         return res.status(HttpStatusCode.Created).json({ jobId: jobId });
     } catch (error) {
         next(error);
