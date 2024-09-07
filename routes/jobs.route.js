@@ -15,8 +15,8 @@ function isValidUUID(uuid) {
 }
 
 function getEntityURL(req, id) {
-    const domain = req.protocol + '://' + req.get('host');
-    return new URL(`/api/jobs/${id}`, domain); // TODO find a solution for hard-coded /api/jobs
+    const requestUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+    return new URL(`${requestUrl}/${id}`, requestUrl); 
 }
 
 router.post('/', async (req, res, next) => {
