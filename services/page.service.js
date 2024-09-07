@@ -2,13 +2,15 @@ import { Readability } from "@mozilla/readability";
 import axios from "axios";
 import * as cheerio from 'cheerio';
 import { JSDOM } from "jsdom";
+import path from 'path';
+import imageDownloader from 'image-downloader';
 
 function getProtocolAndDomain(urlString) {
     try {
         const url = new URL(urlString);
-        const protocol = url.protocol.replace(':', ''); // Remove the trailing colon
+        const protocol = url.protocol.replace(':', ''); 
         const hostname = url.hostname;
-        return `${protocol}://${hostname}`; // Combine them into one string
+        return `${protocol}://${hostname}`; 
     } catch (error) {
         console.error('Invalid URL', error);
         return null;
@@ -71,12 +73,13 @@ export class PageService {
     }
 
     async _downloadImages() {
+        let i = 0;
         for (const url of this.imgUrls) {
             const imageUrl = url[1];
             const articleOrigImgPath = url[0];
             try {
-                const imgPath = path.join(this.repository, 'images', `image${i}.jpg`);
-                console.debug(`Downloading: ${imageUrl} to ${imgPath}`)
+                const imgPath = path.join(this.repository, 'images', `image${i++}.jpg`);
+                console.log(`Downloading: ${imageUrl} to ${imgPath}`)
                 await imageDownloader.image({
                     url: imageUrl,
                     dest: imgPath
@@ -90,7 +93,7 @@ export class PageService {
                 this.article.content = this.article.content.replace(regex, imgPath);
                 this.downloadedImages.push(imgPath);
             } catch (error) {
-                console.log(`Failed to download image: ${imageUrl}`);
+                console.log(`Failed to download image: ${imageUrl} error: ${error}`);
             }
         }
     }
