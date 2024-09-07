@@ -24,6 +24,7 @@ export class PageService {
         this.article = null;
         this.title = null;
         this.imgUrls = [];
+        this.downloadedImages = [];
     }
 
     async loadPage() {
@@ -87,10 +88,9 @@ export class PageService {
                     regex = new RegExp(imageUrl, 'g');
                 }
                 this.article.content = this.article.content.replace(regex, imgPath);
-                downloadedImages.push(imgPath);
+                this.downloadedImages.push(imgPath);
             } catch (error) {
                 console.log(`Failed to download image: ${imageUrl}`);
-                throw error;
             }
         }
     }

@@ -15,7 +15,7 @@ app.use(cors());
 // Artifact repository
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-app.use(express.static(__dirname + '/output'));
+app.locals.workingdir = __dirname;
 
 app.use(
     (err, req, res, next) => {

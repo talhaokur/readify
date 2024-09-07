@@ -3,10 +3,9 @@ import { PageService } from '../services/page.service.js';
 import * as path from 'path';
 import { epubService } from '../services/epub.service.js';
 import { HttpStatusCode } from 'axios';
-import { v4 as uuidv4 } from 'uuid';
+import { jobContainerService } from '../services/jobcontainer.service.js';
 
 const router = Router();
-const repository = '/app/output/';
 
 router.post('/', async (req, res, next) => {
     const { url } = req.body;
@@ -16,12 +15,12 @@ router.post('/', async (req, res, next) => {
     }
 
     try {
-        const jobId = uuidv4();
-        const pg = new PageService(url, repository);
-        await pg.loadPage();
+        const [ jobId, repo ] = await jobContainerService.initializeJob();
+        const pgs = new PageService(url, repo);
+        await pgs.loadPage();
 
-        const content = pg.article.content;
-        const pageTitle = pg.title;
+        const content = pgs.article.content;
+        const pageTitle = pgs.title;
 
         const options = {
             title: pageTitle,
@@ -34,12 +33,12 @@ router.post('/', async (req, res, next) => {
                     data: `<div>${content}</div>`,
                 },
             ],
-            cover: pg._downloadImages[0] || '',
+            cover: pgs.downloadedImages[0] || '',
         };
 
-        const epubFilePath = path.join(repository, `${pageTitle}.epub`);
+        const epubFilePath = path.join(repo, `${pageTitle}.epub`);
         epubService.generateEpub(options, epubFilePath);
-        return res.status(HttpStatusCode.Created).json({jobId: jobId});
+        return res.status(HttpStatusCode.Created).json({ jobId: jobId });
     } catch (error) {
         next(error);
     }
