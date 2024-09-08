@@ -2,6 +2,8 @@ import fs from 'node:fs';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import { GLOBALS } from '../configs.js';
+import RepositoryAlredyExistsError from '../errors/repository-already-exists.error.js';
+import BadParamsError from '../errors/bad-params.error.js';
 
 class JobContainerService {
     async initializeJob() {
@@ -22,7 +24,7 @@ class JobContainerService {
     async _createJobRepository(jobId) {
         const jobRepoPath = path.join(this._getOutputRepositoryPath(), jobId);
         if (fs.existsSync(jobRepoPath))
-            throw new Error(`Job ${jobId} has already a repository.`); // TODO change this to a proper one
+            throw new RepositoryAlredyExistsError(`Job ${jobId} has already a repository.`);
 
         fs.mkdirSync(jobRepoPath);
         console.info(`Job repository is created for jobId:${jobId} path:${jobRepoPath}`);
@@ -32,7 +34,8 @@ class JobContainerService {
     async _createImageRepository(jobId) {
         const imageRepoPath = path.join(this._getOutputRepositoryPath(), jobId, 'images');
         if (fs.existsSync(imageRepoPath))
-            throw new Error(`Image repository is already there for jobId:${jobId}`);  // TODO change this to a proper one
+            throw new RepositoryAlredyExistsError(`Image repository is already there for jobId:${jobId}`);
+        
         fs.mkdirSync(imageRepoPath);
         console.info(`Image repository is created for jobId:${jobId}`);
         return imageRepoPath;
@@ -40,7 +43,7 @@ class JobContainerService {
 
     deleteRepository(jobId) {
         if (!jobId)
-            throw new Error('jobId cannot be null or empty!'); // TODO change this to a proper one
+            throw new BadParamsError('jobId cannot be null or empty!');
 
         const jobRepoPath = path.join(this._getOutputRepositoryPath(), jobId);
 
@@ -50,7 +53,7 @@ class JobContainerService {
 
     deleteImageRepositoryForJob(jobId) {
         if (!jobId)
-            throw new Error('path cannot be null or empty!'); // TODO change this to a proper one
+            throw new BadParamsError('path cannot be null or empty!');
 
         const imageRepoPath = path.join(this._getOutputRepositoryPath(), jobId, 'images');
         fs.rmSync(imageRepoPath, {recursive: true, force: true});

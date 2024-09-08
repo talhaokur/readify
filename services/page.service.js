@@ -4,6 +4,7 @@ import * as cheerio from 'cheerio';
 import { JSDOM } from "jsdom";
 import path from 'path';
 import imageDownloader from 'image-downloader';
+import BadParamsError from "../errors/bad-params.error.js";
 
 function getProtocolAndDomain(urlString) {
     try {
@@ -38,7 +39,7 @@ export class PageService {
 
     async _getPage() {
         if (!this.url)
-            throw new Error(); // TODO change this to proper error
+            throw new BadParamsError("url cannot be null or empty!");
         const response = await axios.get(this.url);
         this.html = response.data;
         this.hostName = getProtocolAndDomain(this.url);
@@ -56,6 +57,10 @@ export class PageService {
     }
 
     _extractImgUrls() {
+        if (!this.hostName) {
+            throw new BadParamsError("hostName cannot be null or empty!");
+        }
+        
         const $ = cheerio.load(this.html);
         $('img').each((i, el) => {
             const imgUrl = $(el).attr('src');
@@ -63,8 +68,7 @@ export class PageService {
                 if (!imgUrl.startsWith(this.hostName)) {
                     const imgFullUrl = this.hostName + imgUrl;
                     this.imgUrls.push([imgUrl, imgFullUrl]);
-                }
-                else {
+                } else {
                     this.imgUrls.push([imgUrl, null]);
                 }
                 console.debug("img url pushed", imgUrl);

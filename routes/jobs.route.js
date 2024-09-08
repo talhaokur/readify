@@ -1,11 +1,12 @@
-import { Router } from 'express';
-import { PageService } from '../services/page.service.js';
-import * as path from 'path';
-import { epubService } from '../services/epub.service.js';
 import { HttpStatusCode } from 'axios';
-import { jobContainerService } from '../services/jobcontainer.service.js';
+import { Router } from 'express';
 import fs from 'node:fs';
+import * as path from 'path';
 import { GLOBALS } from '../configs.js';
+import NotImplementedError from '../errors/not-implemented.error.js';
+import { epubService } from '../services/epub.service.js';
+import { jobContainerService } from '../services/jobcontainer.service.js';
+import { PageService } from '../services/page.service.js';
 
 const router = Router();
 
@@ -16,7 +17,7 @@ function isValidUUID(uuid) {
 
 function getEntityURL(req, id) {
     const requestUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-    return new URL(`${requestUrl}/${id}`, requestUrl); 
+    return new URL(`${requestUrl}/${id}`, requestUrl);
 }
 
 router.post('/', async (req, res, next) => {
@@ -25,7 +26,7 @@ router.post('/', async (req, res, next) => {
     if (!url) {
         return res.status(HttpStatusCode.BadRequest).json({ error: 'URL is required' });
     }
-    console.log("new request for: ", );
+
     try {
         const [jobId, repo] = await jobContainerService.initializeJob();
         const pgs = new PageService(url, repo);
@@ -52,34 +53,31 @@ router.post('/', async (req, res, next) => {
         await epubService.generateEpub(options, epubFilePath);
         jobContainerService.deleteImageRepositoryForJob(jobId);
         const entityUrl = getEntityURL(req, jobId);
-        return res.status(HttpStatusCode.Created).json({ jobId: jobId, entity: entityUrl});
+        return res.status(HttpStatusCode.Created).json({ jobId: jobId, entityUrl: entityUrl });
     } catch (error) {
         next(error);
     }
 });
 
 router.get('/', (req, res) => {
-    // TODO
-    return res.status(HttpStatusCode.NotImplemented).json();
+    throw new NotImplementedError("this feature is not implemented yet");
 });
 
 router.get("/:uuid", async (req, res, next) => {
     const { uuid } = req.params;
     if (!isValidUUID(uuid))
         return res.status(HttpStatusCode.BadRequest).json({ message: `Given id is not valid` });
+    
     const jobRepository = path.join(GLOBALS.outputDir, uuid);
 
     if (!fs.existsSync(jobRepository))
         return res.status(HttpStatusCode.NotFound).json({ message: `No job found with id:${uuid}` });
 
     try {
-        const epubPath = epubService.getEpubFilePath(jobRepository, (p) => { return p; });
-        if (!epubPath)
-            return res.status(HttpStatusCode.NotFound).json({ message: "No ePub found!" });
-
+        const epubPath = epubService.getEpubFilePath(uuid, jobRepository);
         return res.download(epubPath);
     } catch (error) {
-        console.error('error during getting epub file for', uuid, error);
+        next(error);
     }
 });
 
@@ -97,7 +95,6 @@ router.delete("/:uuid", (req, res, next) => {
         jobContainerService.deleteRepository(uuid);
         return res.status(HttpStatusCode.Ok).json({ message: `Job ${uuid} deleted successfully` });
     } catch (error) {
-        console.error("Error during deletion of the job repository for ", uuid, error);
         next(error);
     }
 });
