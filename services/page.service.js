@@ -9,9 +9,9 @@ import BadParamsError from "../errors/bad-params.error.js";
 function getProtocolAndDomain(urlString) {
     try {
         const url = new URL(urlString);
-        const protocol = url.protocol.replace(':', ''); 
+        const protocol = url.protocol.replace(':', '');
         const hostname = url.hostname;
-        return `${protocol}://${hostname}`; 
+        return `${protocol}://${hostname}`;
     } catch (error) {
         console.error('Invalid URL', error);
         return null;
@@ -26,7 +26,7 @@ export class PageService {
         this.hostName = null;
         this.article = null;
         this.title = null;
-        this.imgUrls = [];
+        this.images = [];
         this.downloadedImages = [];
     }
 
@@ -35,6 +35,7 @@ export class PageService {
         this._readifyPage();
         this._extractImgUrls();
         await this._downloadImages();
+        this._replaceImageUrlsOnArticle();
     }
 
     async _getPage() {
@@ -60,45 +61,50 @@ export class PageService {
         if (!this.hostName) {
             throw new BadParamsError("hostName cannot be null or empty!");
         }
-        
+
         const $ = cheerio.load(this.html);
         $('img').each((i, el) => {
             const imgUrl = $(el).attr('src');
             if (imgUrl) {
-                if (!imgUrl.startsWith(this.hostName)) {
-                    const imgFullUrl = this.hostName + imgUrl;
-                    this.imgUrls.push([imgUrl, imgFullUrl]);
-                } else {
-                    this.imgUrls.push([imgUrl, null]);
-                }
-                console.debug("img url pushed", imgUrl);
+                this.images.push({ url: imgUrl, path: null });
+                console.debug("image found:", imgUrl);
             }
         });
     }
 
+    _buildImageUrl(imageUrl) {
+        return new URL(imageUrl, this.hostName).href;
+    }
+
     async _downloadImages() {
-        let i = 0;
-        for (const url of this.imgUrls) {
-            const imageUrl = url[1];
-            const articleOrigImgPath = url[0];
-            try {
-                const imgPath = path.join(this.repository, 'images', `image${i++}.jpg`);
-                console.log(`Downloading: ${imageUrl} to ${imgPath}`)
-                await imageDownloader.image({
-                    url: imageUrl,
-                    dest: imgPath
-                });
-                let regex;
-                if (articleOrigImgPath) {
-                    regex = new RegExp(articleOrigImgPath, 'g');
-                } else {
-                    regex = new RegExp(imageUrl, 'g');
-                }
-                this.article.content = this.article.content.replace(regex, imgPath);
-                this.downloadedImages.push(imgPath);
-            } catch (error) {
-                console.log(`Failed to download image: ${imageUrl} error: ${error}`);
-            }
+        const promises = [];
+
+        for (let i = 0; i < this.images.length; i++) {
+            const imageUrl = this.images[i].url;
+            const imageFullUrl = imageUrl.startsWith(this.hostName) ? imageUrl : this._buildImageUrl(imageUrl);
+            const imgPath = path.join(this.repository, 'images', `image${i}.jpg`);
+            const downloadPromise = this.downloadImage(imageFullUrl, imgPath);
+            this.images[i].path = imgPath;
+            promises.push(downloadPromise);
         }
+
+        await Promise.all(promises);
+    }
+
+    _replaceImageUrlsOnArticle() {
+        for (const image of this.images) {
+            const regex = new RegExp(image.url, 'g');
+            console.debug("replacing ", image.url, " with ", image.path);
+            this.article.content = this.article.content.replace(regex, image.path);
+        }
+    }
+
+    async downloadImage(imageUrl, imgPath) {
+        console.debug(`Downloading: ${imageUrl} to ${imgPath}`);
+        await imageDownloader.image({
+            url: imageUrl,
+            dest: imgPath
+        });
+        this.downloadedImages.push(imgPath);
     }
 }
