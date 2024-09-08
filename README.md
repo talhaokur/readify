@@ -2,7 +2,7 @@
 
 This is one of my hobby projects. I would like to learn a new language as well as a new framework.
 
-It retrieves a URL, makes it more readable, and creates an ePub file with the article.
+It retrieves a list of URLs, makes them more readable, and creates an ePub file with the articles.
 
 ## How to run it
 ### Local
@@ -26,13 +26,20 @@ docker run -p 3000:3000 --name readify-app -v readify-data:/app/output readify-a
 ```
 
 ## Usage
-To generate an ePub, make a POST request to `/api/jobs` endpoint with `url` in the JSON payload. 
+To generate an ePub, make a POST request to `/api/jobs`. 
 
+Example request:
 ```bash
 curl --location 'http://localhost:3000/api/jobs' \
 --header 'Content-Type: application/json' \
 --data '{
-    "url": "https://example.com"
+    "title": "Example Title",
+    "urls": [
+        "https://example.com/example-article",
+        "https://example.org/another-example-article"
+    ],
+    "author": "Author Name",
+    "coverImageUrl": "https://example.com/assets/cover.jpg"
 }'
 ```
 
@@ -47,10 +54,11 @@ Example success response:
 ```
 
 ## TODO
-- [ ] Support for multiple URLs
+- [x] Support for multiple URLs
 - [ ] API Documentation
 - [ ] User documentation 
 - [ ] Authentication
 - [ ] Metrics
 - [ ] Send with email support
 - [ ] Support for kafka
+- [ ] Configurations with file/env vars
