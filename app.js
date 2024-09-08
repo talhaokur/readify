@@ -1,11 +1,11 @@
-import express from 'express';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import cors from 'cors';
 import bodyParser from "body-parser";
-import routes from './routes/index.js';
+import cors from 'cors';
+import express from 'express';
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { GLOBALS } from './configs.js';
-import path from 'path';
+import UnhandledErrorMiddleware from './middlewares/unhandled-errors.middleware.js';
+import routes from './routes/index.js';
 
 const app = express();
 app.use(bodyParser.json());
@@ -20,18 +20,8 @@ const __dirname = dirname(__filename);
 GLOBALS.workingDir = __dirname;
 GLOBALS.outputDir = path.join(__dirname, 'output');
 
-app.use(
-    (err, req, res, next) => {
-        if (err && err.errorCode) {
-            res.status(err.errorCode).json(err.message);
-        } else if (err) {
-            res.status(500).json(err.message);
-        }
-        console.error(`${err}, ${err.message}`)
-    });
-
-// Mount the routes
 app.use(routes);
+app.use(UnhandledErrorMiddleware);
 
 const PORT = process.env.PORT || 3000;
 
