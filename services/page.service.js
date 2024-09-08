@@ -1,9 +1,8 @@
 import { Readability } from "@mozilla/readability";
 import axios from "axios";
-import * as cheerio from 'cheerio';
+import imageDownloader from 'image-downloader';
 import { JSDOM } from "jsdom";
 import path from 'path';
-import imageDownloader from 'image-downloader';
 import BadParamsError from "../errors/bad-params.error.js";
 
 function getProtocolAndDomain(urlString) {
@@ -22,6 +21,7 @@ export class PageService {
     constructor(url, repository) {
         this.url = url;
         this.repository = repository;
+        this.dom = null;
         this.html = null;
         this.hostName = null;
         this.article = null;
@@ -62,12 +62,12 @@ export class PageService {
             throw new BadParamsError("hostName cannot be null or empty!");
         }
 
-        const $ = cheerio.load(this.html);
-        $('img').each((i, el) => {
-            const imgUrl = $(el).attr('src');
+        const dom = new JSDOM(this.html);
+        dom.window.document.querySelectorAll('img').forEach((el) => {
+            const imgUrl = el.getAttribute('src');
             if (imgUrl) {
                 this.images.push({ url: imgUrl, path: null });
-                console.debug("image found:", imgUrl);
+                console.log("image found:", imgUrl);
             }
         });
     }
