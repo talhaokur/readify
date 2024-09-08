@@ -1,7 +1,7 @@
 {
     "name": "readify-app",
-    "version": "1.0.0",
-    "description": "Basic Node.js API for /readify with Mozilla Readability",
+    "version": "0.1.0",
+    "description": "Basic Node.js API for creating an ePub file of simplified web pages by Mozilla's readability.",
     "main": "app.js",
     "scripts": {
         "start": "node app.js"
