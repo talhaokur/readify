@@ -76,15 +76,25 @@ export class PageService {
         return new URL(imageUrl, this.hostName).href;
     }
 
+    _getFileNameFromPathWithRandomChars(path, length) {
+        if (!path) 
+            return "";
+        const fileName = path.split('/').pop().split('.').slice(0, -1).join('.');
+        const randomChars = Math.random().toString(36).substring(2, 2 + length);
+
+        return `${fileName}-${randomChars}`;
+    }
+
     async _downloadImages() {
         const promises = [];
 
-        for (let i = 0; i < this.images.length; i++) {
-            const imageUrl = this.images[i].url;
+        for (const image of this.images) {
+            const imageUrl = image.url;
             const imageFullUrl = imageUrl.startsWith(this.hostName) ? imageUrl : this._buildImageUrl(imageUrl);
-            const imgPath = path.join(this.repository, 'images', `image${i}.jpg`);
+            const newImageName = this._getFileNameFromPathWithRandomChars(imageUrl, 10);
+            const imgPath = path.join(this.repository, 'images', `${newImageName}.jpg`);
             const downloadPromise = this.downloadImage(imageFullUrl, imgPath);
-            this.images[i].path = imgPath;
+            image.path = imgPath;
             promises.push(downloadPromise);
         }
 
