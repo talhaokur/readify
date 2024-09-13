@@ -5,7 +5,7 @@ import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { GLOBALS } from './configs.js';
 import UnhandledErrorMiddleware from './middlewares/unhandled-errors.middleware.js';
-import routes from './routes/index.js';
+import { router, v1Router } from './routes/index.js';
 
 const app = express();
 app.use(bodyParser.json());
@@ -20,7 +20,8 @@ const __dirname = dirname(__filename);
 GLOBALS.workingDir = __dirname;
 GLOBALS.outputDir = path.join(__dirname, 'output');
 
-app.use(routes);
+app.use(router);
+app.use('/api/v1', v1Router);
 app.use(UnhandledErrorMiddleware);
 
 const PORT = process.env.PORT || 3000;

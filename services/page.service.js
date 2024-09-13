@@ -64,7 +64,6 @@ export class PageService {
         const reader = new Readability(dom.window.document);
         page.article = reader.parse();
         page.title = page.article.title.trim();
-        dom.close();
     }
 
     _extractImgUrls(page) {
@@ -86,7 +85,6 @@ export class PageService {
 
             page.images.push({ url: imgUrl, originalUrl: imgUrlOriginal, path: null });
         });
-        dom.close();
     }
 
     _buildImageUrl(imageUrl) {

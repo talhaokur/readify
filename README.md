@@ -54,8 +54,9 @@ Example success response:
 ```
 
 ## TODO
-- [x] Support for multiple URLs
+- [x] ~~Support for multiple URLs~~
 - [ ] API Documentation
+- [x] ~~API versioning~~
 - [ ] User documentation 
 - [ ] Authentication
 - [ ] Metrics

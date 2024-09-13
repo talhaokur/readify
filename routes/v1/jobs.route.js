@@ -2,13 +2,13 @@ import { HttpStatusCode } from 'axios';
 import { Router } from 'express';
 import fs from 'node:fs';
 import * as path from 'path';
-import { GLOBALS } from '../configs.js';
-import NotImplementedError from '../errors/not-implemented.error.js';
-import { epubService } from '../services/epub.service.js';
-import { jobContainerService } from '../services/jobcontainer.service.js';
-import { PageService } from '../services/page.service.js';
-import InvalidRequestError from '../errors/invalid-request.error.js';
-import Page from '../models/page.model.js';
+import { GLOBALS } from '../../configs.js';
+import NotImplementedError from '../../errors/not-implemented.error.js';
+import { epubService } from '../../services/epub.service.js';
+import { jobContainerService } from '../../services/jobcontainer.service.js';
+import { PageService } from '../../services/page.service.js';
+import InvalidRequestError from '../../errors/invalid-request.error.js';
+import Page from '../../models/page.model.js';
 
 const router = Router();
 

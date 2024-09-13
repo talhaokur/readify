@@ -1,20 +1,19 @@
 import { Router } from 'express';
-import jobsRoute from './jobs.route.js';
+import jobsRouteV1 from './v1/jobs.route.js';
 
-const router = Router();
+export const router = Router();
+export const v1Router = Router();
 
 router.get('/', (req, res, next) => {
-    return res.status(200).json({ 
-        status: 'Success' 
+    return res.status(200).json({
+        status: 'Success'
     });
 });
 
 router.get('/ping', (req, res, next) => {
-    return res.status(200).json({ 
-        message: 'Up' 
+    return res.status(200).json({
+        message: 'Up'
     });
 });
 
-router.use('/api/jobs', jobsRoute);
-
-export default router;
+v1Router.use('/jobs', jobsRouteV1);
