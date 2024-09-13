@@ -4,6 +4,18 @@ This is one of my hobby projects. I would like to learn a new language as well a
 
 It retrieves a list of URLs, makes them more readable, and creates an ePub file with the articles.
 
+## Disclaimer
+
+This application is a personal hobby project and is provided for educational and non-commercial purposes only. The tool allows users to download and convert content from provided URLs into an ePub format. However, it is the responsibility of each user to ensure that they are complying with copyright laws and terms of service of the websites they access.
+
+### Legal Notice:
+- The creator of this application does not claim ownership or responsibility for the content downloaded, converted, or redistributed by users.
+- This tool is not intended to be used for downloading copyrighted content without permission or violating the rights of content creators or website owners.
+- Any misuse of this tool for illegal or unethical purposes is strictly prohibited. The creator will not be held liable for any legal consequences or damages resulting from improper use.
+- By using this software, you agree to comply with these terms and take full responsibility for your actions.
+
+Please respect copyright and intellectual property rights when using this tool.
+
 ## How to run it
 ### Local
 ```bash
