@@ -1,10 +1,10 @@
 import fs from 'node:fs';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
-import { GLOBALS } from '../src/configs.js';
-import RepositoryAlredyExistsError from '../src/errors/repository-already-exists.error.js.js';
-import BadParamsError from '../src/errors/bad-params.error.js.js';
-import ResourceNotFound from '../src/errors/resource-not-found.error.js.js';
+import { GLOBALS } from '../configs.js';
+import RepositoryAlredyExistsError from '../errors/repository-already-exists.error.js';
+import BadParamsError from '../errors/bad-params.error.js';
+import ResourceNotFound from '../errors/resource-not-found.error.js';
 
 class FileService {
     async initializeJob(jobId) {
