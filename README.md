@@ -38,11 +38,11 @@ docker run -p 3000:3000 --name readify-app -v readify-data:/app/output readify-a
 ```
 
 ## Usage
-To generate an ePub, make a POST request to `/api/jobs`. 
+To generate an ePub, make a POST request to `/api/v1/jobs`. 
 
 Example request:
 ```bash
-curl --location 'http://localhost:3000/api/jobs' \
+curl --location 'http://localhost:3000/api/v1/jobs' \
 --header 'Content-Type: application/json' \
 --data '{
     "title": "Example Title",
@@ -55,13 +55,28 @@ curl --location 'http://localhost:3000/api/jobs' \
 }'
 ```
 
-If everything goes well, you should get the URL of the entity. You can retrieve the ePub file with a get request.
-
 Example success response:
 ```json
 {
-    "jobId": "aa4f2fe3-0c95-4827-ba4d-0b441700f59b",
-    "entityUrl": "http://localhost:3000/api/jobs/aa4f2fe3-0c95-4827-ba4d-0b441700f59b"
+    "id": "4de527c6-2031-446c-89d3-25fcc5d4e31c",
+    "status": "RUNNING",
+    "artifactPath": null
+}
+```
+
+If everything goes well, you should get the URL of the entity. You can retrieve job status with a get request.
+
+Example `GET /api/v1/jobs/<JOB_ID>` request:
+```bash
+curl --location 'http://localhost:3000/api/v1/jobs/d660618e-0dbc-4b83-b1e6-6e898420fa91'
+```
+
+Example response:
+```json
+{
+    "type": "UserError/Job Still Running",
+    "message": "Job id:d660618e-0dbc-4b83-b1e6-6e898420fa91 is still running",
+    "details": null
 }
 ```
 
@@ -74,5 +89,5 @@ Example success response:
 - [ ] Metrics
 - [ ] Send with email support
 - [ ] Support for kafka
-- [x] Configurations with file/env vars
-- [x] Automatic job cleaning process
+- [x] ~~Configurations with file/env vars~~
+- [x] ~~Automatic job cleaning process~~
