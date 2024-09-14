@@ -74,4 +74,5 @@ Example success response:
 - [ ] Metrics
 - [ ] Send with email support
 - [ ] Support for kafka
-- [ ] Configurations with file/env vars
+- [x] Configurations with file/env vars
+- [x] Automatic job cleaning process

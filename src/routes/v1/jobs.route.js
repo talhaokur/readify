@@ -1,12 +1,8 @@
 import { HttpStatusCode } from 'axios';
 import { Router } from 'express';
-import fs from 'node:fs';
-import * as path from 'path';
-import { GLOBALS } from '../../configs.js';
-import NotImplementedError from '../../errors/not-implemented.error.js';
-import { fileService } from '../../services/file.service.js';
 import * as jobController from '../../controllers/job.controller.js';
 import InvalidRequestError from '../../errors/invalid-request.error.js';
+import NotImplementedError from '../../errors/not-implemented.error.js';
 
 
 const router = Router();
@@ -65,9 +61,11 @@ router.get("/:uuid", async (req, res, next) => {
     }
 });
 
-router.delete("/:uuid", (req, res, next) => {
+router.delete("/:uuid", async (req, res, next) => {
+    const { uuid } = req.params;
+
     try {
-        jobController.deleteJob(req, res);
+        await jobController.deleteJob(req, res);
         return res.status(HttpStatusCode.Ok).json({
             message: `Job ${uuid} deleted successfully`
         });
