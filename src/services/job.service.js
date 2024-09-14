@@ -72,7 +72,6 @@ export const getJob = (jobId) => {
     if (isJobRunning(jobId))
         return new JobModel(jobId, JobStatus.RUNNING, null);
 
-
     if (isJobFailed(jobId))
         return new JobModel(jobId, JobStatus.FAILED, null);
 

@@ -6,6 +6,7 @@ import RepositoryAlredyExistsError from "../errors/repository-already-exists.err
 import ResourceNotFound from '../errors/resource-not-found.error.js';
 import InvalidIdError from '../errors/invalid-id.error.js';
 import JobNotFoundError from '../errors/job-not-found.error.js';
+import ConflicError from '../errors/conflict.error.js';
 
 const UnhandledErrorMiddleware = (err, req, res, next) => {
     let statusCode = null;
@@ -35,6 +36,10 @@ const UnhandledErrorMiddleware = (err, req, res, next) => {
         case JobNotFoundError:
             statusCode = HttpStatusCode.NotFound;
             type = "Resource/Not Found";
+            break;
+        case ConflicError:
+            statusCode = HttpStatusCode.Conflict;
+            type = "UserError/Job Still Running";
             break;
         default:
             statusCode = HttpStatusCode.InternalServerError;
