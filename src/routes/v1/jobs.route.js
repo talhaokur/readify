@@ -40,10 +40,8 @@ router.post('/', async (req, res, next) => {
     try {
         validatePostRequestParams(req.body);
         const jobId = await jobController.createJob(req);
-        return res.status(HttpStatusCode.Created).json({
-            jobId: jobId,
-            status: 'IN_PROGRESS'
-        });
+	const job = new JobModel(jobId, JobStatus.RUNNING, null);
+        return res.status(HttpStatusCode.Created).json(job);
     } catch (error) {
         next(error);
     }
