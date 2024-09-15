@@ -18,4 +18,4 @@ RUN mkdir -p output
 EXPOSE 3000
 
 # Start the app with nodemon for auto-reloading
-CMD ["node", "--env-file=.env", "app.js"]
+CMD ["node", "app.js"]
