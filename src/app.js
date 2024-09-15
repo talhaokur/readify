@@ -6,6 +6,9 @@ import { fileURLToPath } from 'url';
 import { GLOBALS } from './configs.js';
 import UnhandledErrorMiddleware from './middlewares/unhandled-errors.middleware.js';
 import { router, v1Router } from './routes/index.js';
+import { validateEnvVars } from "./utils/validators/environment.validator.js";
+
+validateEnvVars();
 
 const app = express();
 app.use(bodyParser.json());
