@@ -1,3 +1,5 @@
+import { isValidNumber } from "./value.validator.js";
+
 export function validateEnvVars() {
     const vars = process.env;
 
@@ -20,9 +22,4 @@ export function validateEnvVars() {
         console.error("JOB_TTL value is invalid. It can only be an integer or a float.");
         process.exit(1);
     }
-}
-
-function isValidNumber(val) {
-    const parsed = parseFloat(val);
-    return !isNaN(parsed) && String(parsed) === val.trim();
 }

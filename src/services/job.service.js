@@ -9,6 +9,7 @@ import Queue from 'bull';
 import Page from '../models/page.model.js';
 import { PageService } from './page.service.js';
 import * as epubService from "../services/epub.service.js";
+import * as valueValidator from '../utils/validators/value.validator.js';
 
 const queueOptions = {
     redis: {
@@ -56,9 +57,12 @@ export const runJob = async (jobId, urls, title, author, coverImageUrl) => {
         expiryQueue.add({ jobId }, {
             delay: expiryTime,
             jobId: jobId
-        }).catch((error) => {
-            console.error("error while adding job to expiryQueue, error:", error);
-        });
+        }).then(() => {
+            console.info("a timer for job", jobId, "added to the queue");
+        })
+            .catch((error) => {
+                console.error("error while adding job to expiryQueue, error:", error);
+            });
     } catch (error) {
         console.error('Error during running a job. Repository will be marked. Error:', error.message);
         fileService.markJobRepository(jobId);
@@ -119,26 +123,37 @@ function getJobArtifactPath(jobId) {
 }
 
 function getExpiryTime() {
-    const expiryMode = process.env.EXPIRY_MODE.toUpperCase();
-    const defaultTTL = 60000;
+    const expiryMode = process.env.EXPIRY_MODE;
+    const defaultTTL = 60_000;
 
-    try {
-        switch (expiryMode) {
-            case "RANDOM":
-                const minMs = parseFloat(process.env.EXPIRY_MIN) * 60 * 1000;
-                const maxMs = parseFloat(process.env.EXPIRY_MAX) * 60 * 1000;
-                return Math.random() * (maxMs - minMs) + minMs;
-            case "CONSTANT":
-                return parseFloat(process.env.JOB_TLS);
-            default:
-                console.warn('invalid expiry mode set on ENV, returning default TTL value');
-                return defaultTTL;
-        }
-    } catch (error) {
-        console.error('error while retrieving expiry mode settings from ENV,', 
-            'returning default TTL value. error:', error.message);
+    switch (expiryMode.toUpperCase()) {
+        case "RANDOM":
+            return getRandomExpiryTime(defaultTTL);
+        case "CONSTANT":
+            const ttl = parseFloat(process.env.JOB_TTL);
+            return valueValidator.isValidNumber(ttl) ? ttl : defaultTTL;
+        default:
+            console.warn('invalid expiry mode set on ENV, returning default TTL value');
+            return defaultTTL;
+    }
+}
+
+function getRandomExpiryTime(defaultTTL) {
+    const expiryMin = process.env.EXPIRY_MIN;
+    const expiryMax = process.env.EXPIRY_MAX;
+
+    if (!expiryMin || !expiryMax) {
         return defaultTTL;
     }
+
+    if (!valueValidator.isValidNumber(expiryMin) ||
+        !valueValidator.isValidNumber(expiryMax)) {
+        return defaultTTL;
+    }
+
+    const minMs = parseFloat(expiryMin) * 60_000;
+    const maxMs = parseFloat(expiryMax) * 60_000;
+    return Math.random() * (maxMs - minMs) + minMs;
 }
 
 function populatePageObjs(urls) {
