@@ -3,7 +3,7 @@ import { Router } from 'express';
 import * as jobController from '../../controllers/job.controller.js';
 import InvalidRequestError from '../../errors/invalid-request.error.js';
 import NotImplementedError from '../../errors/not-implemented.error.js';
-import JobModel from '../../models/job.model.js';
+import JobModel, { JobStatus } from '../../models/job.model.js';
 
 
 const router = Router();
@@ -41,7 +41,7 @@ router.post('/', async (req, res, next) => {
     try {
         validatePostRequestParams(req.body);
         const jobId = await jobController.createJob(req);
-	    const job = new JobModel(jobId, JobStatus.RUNNING, null);
+        const job = new JobModel(jobId, JobStatus.RUNNING, null);
         return res.status(HttpStatusCode.Created).json(job);
     } catch (error) {
         next(error);
